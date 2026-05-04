@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
@@ -21,6 +22,7 @@ import com.example.notesapp.platform.DeviceInfo
 import com.example.notesapp.platform.NetworkMonitor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,6 +39,11 @@ fun App() {
     var searchQuery by remember { mutableStateOf("") }
     var selectedNoteId by remember { mutableStateOf<Long?>(null) }
     var showSettings by remember { mutableStateOf(false) }
+
+    val geminiService = koinInject<GeminiService>()
+    val scope = rememberCoroutineScope()
+    var aiSuggestion by remember { mutableStateOf("") }
+    var isAiLoading by remember { mutableStateOf(false) }
 
     val isOnline by remember { mutableStateOf(networkMonitor.isConnected) }
 
@@ -120,6 +127,29 @@ fun App() {
                             modifier = Modifier.fillMaxWidth()
                         )
                         Spacer(modifier = Modifier.height(12.dp))
+
+                        TextButton(
+                            onClick = {
+                                scope.launch {
+                                    isAiLoading = true
+                                    val suggestion = geminiService.getAiSummary(noteContent)
+                                    noteContent = suggestion // Ganti isi catatan dengan saran AI
+                                    isAiLoading = false
+                                }
+                            },
+                            enabled = isOnline && noteContent.isNotBlank() && !isAiLoading,
+                            contentPadding = PaddingValues(0.dp)
+                        ) {
+                            if (isAiLoading) {
+                                CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("AI sedang bekerja...")
+                            } else {
+                                Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Perbaiki dengan AI")
+                            }
+                        }
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),

@@ -7,14 +7,13 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     id("app.cash.sqldelight")
+    kotlin("plugin.serialization") version "2.1.0"
 }
 
 kotlin {
     androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "11"
-            }
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
         }
     }
 
@@ -54,6 +53,10 @@ kotlin {
             implementation(compose.materialIconsExtended)
             implementation("io.insert-koin:koin-core:3.5.3")
             implementation("io.insert-koin:koin-compose:1.1.2")
+            implementation("io.ktor:ktor-client-core:2.3.12")
+            implementation("io.ktor:ktor-client-content-negotiation:2.3.12")
+            implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.12")
+            implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
