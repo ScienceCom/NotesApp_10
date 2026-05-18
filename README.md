@@ -1,48 +1,45 @@
-This is a Kotlin Multiplatform project targeting Android, iOS, Desktop (JVM).
+Strategi & Implementasi Testing
+Proyek ini menerapkan pengujian ketat untuk memastikan stabilitas kode dengan target Code Coverage komponen logika bisnis (ViewModel & Repository) minimal 60%.
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
+1. Flow Testing dengan Turbine (Layer ViewModel)
+Pengujian aliran data asinkronus menggunakan Turbine untuk memastikan emisi data dari StateFlow berjalan lancar tanpa hambatan threading. Menggunakan UnconfinedTestDispatcher() guna menghindari isu blocking coroutine.
 
-* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+Skenario pengujian meliputi:
 
-### Build and Run Android Application
+Test Case 1 (test5_NotesFlow_EmitsInitialStateAndUpdatedData): Memastikan Flow memancarkan state awal (kosong) dan berhasil memancarkan data terbaru setelah pemicu (loadNotes()) dipanggil.
 
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
+Test Case 2 (test6_NotesFlow_ShouldBeEmpty_WhenRepositoryIsEmpty): Memastikan Flow mengembalikan daftar kosong secara valid ketika repository tidak memiliki data.
 
-### Build and Run Desktop (JVM) Application
+2. UI Testing (Layer NotesScreen)
+Pengujian visual dan fungsionalitas UI Compose ditempatkan pada direktori androidInstrumentedTest dengan cakupan minimal 3 kasus uji:
 
-To build and run the development version of the desktop app, use the run configuration from the run widget
-in your IDE’s toolbar or run it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:run
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:run
-  ```
+Test Case 1 (test1_NotesList_ShouldDisplayNotes): Memastikan item catatan (Judul & Konten) muncul dengan benar di layar saat list berisi data.
 
-### Build and Run iOS Application
+Test Case 2 (test2_AddNoteForm_ShouldAcceptInput): Mensimulasikan input teks pada form judul/konten dan memastikan tombol "Simpan" meneruskan data secara valid.
 
-To build and run the development version of the iOS app, use the run configuration from the run widget
-in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+Test Case 3 (test3_EmptyNotes_ShouldShowEmptyMessage): Memastikan pesan fallback/placeholder seperti "Tidak ada catatan" muncul jika list data kosong.
 
----
+⚙️ Cara Menjalankan Aplikasi & Pengujian
+Menjalankan Aplikasi
+Pilih konfigurasi run composeApp di Android Studio dan klik tombol Run, atau gunakan gradle command:
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+Bash
+./gradlew :composeApp:assembleDebug
+Menjalankan Unit & Flow Test
+Untuk mengeksekusi seluruh pengujian logika bisnis pada ViewModel dan Repository, jalankan perintah berikut:
+
+Bash
+./gradlew :composeApp:testDebugUnitTest
+Menjalankan UI Test Compose
+Pastikan emulator atau perangkat Android fisik dalam kondisi aktif dan terhubung, kemudian jalankan:
+
+Bash
+./gradlew :composeApp:connectedDebugAndroidTest
+Memeriksa Code Coverage (Batas Minimum 60%)
+Untuk melihat persentase cakupan kode logika bisnis:
+
+Klik kanan pada paket test atau class test utama (misal NotesViewModelTest).
+
+Pilih opsi "Run 'NotesViewModelTest' with Coverage".
+
+Hasil presentase baris (Line %) dan metode (Method %) akan muncul pada panel Coverage Android Studio.
