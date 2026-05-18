@@ -30,7 +30,6 @@ import org.koin.compose.koinInject
 fun App() {
     val database: NotesDatabase = koinInject()
     val deviceInfo: DeviceInfo = koinInject()
-    val networkMonitor: NetworkMonitor = koinInject()
 
     val notesQueries = database.noteQueries
 
@@ -45,7 +44,6 @@ fun App() {
     var aiSuggestion by remember { mutableStateOf("") }
     var isAiLoading by remember { mutableStateOf(false) }
 
-    val isOnline by remember { mutableStateOf(networkMonitor.isConnected) }
 
     val notesList by remember(searchQuery) {
         if (searchQuery.isEmpty()) {
@@ -68,17 +66,7 @@ fun App() {
                         }
                     )
                     // Network Indicator Bar
-                    Surface(
-                        modifier = Modifier.fillMaxWidth(),
-                        color = if (isOnline) Color(0xFF4CAF50) else Color(0xFFE57373)
-                    ) {
-                        Text(
-                            text = if (isOnline) "Koneksi: Online" else "Koneksi: Offline (Mode Lokal)",
-                            color = Color.White,
-                            style = MaterialTheme.typography.labelSmall,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                        )
-                    }
+
                 }
             }
         ) { padding ->
@@ -137,7 +125,6 @@ fun App() {
                                     isAiLoading = false
                                 }
                             },
-                            enabled = isOnline && noteContent.isNotBlank() && !isAiLoading,
                             contentPadding = PaddingValues(0.dp)
                         ) {
                             if (isAiLoading) {
@@ -216,7 +203,6 @@ fun App() {
                     Text(deviceInfo.getDeviceModel())
                     Spacer(modifier = Modifier.height(8.dp))
                     Text("Status Jaringan:", style = MaterialTheme.typography.labelLarge)
-                    Text(if (isOnline) "Terhubung" else "Terputus")
                 }
             },
             confirmButton = {

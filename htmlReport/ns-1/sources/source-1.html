@@ -1,0 +1,148 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NotesRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.example.notesapp.data</a>
+</div>
+
+<h1>Coverage Summary for Class: NotesRepository (com.example.notesapp.data)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NotesRepository</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (9/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.example.notesapp.data
+&nbsp;
+&nbsp;import com.example.notesapp.database.NotesDatabase
+&nbsp;import com.example.notesapp.database.Note
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import app.cash.sqldelight.coroutines.asFlow
+&nbsp;import app.cash.sqldelight.coroutines.mapToList
+&nbsp;import kotlinx.coroutines.Dispatchers
+&nbsp;import kotlinx.coroutines.IO
+&nbsp;import kotlin.time.ExperimentalTime
+&nbsp;
+<b class="fc">&nbsp;class NotesRepository(private val database: NotesDatabase) {</b>
+&nbsp;
+<b class="fc">&nbsp;    private val queries = database.noteQueries</b>
+&nbsp;
+&nbsp;    // 1. Ambil Semua Catatan (Menggunakan selectAll sesuai .sq)
+&nbsp;    fun getAllNotes(): Flow&lt;List&lt;Note&gt;&gt; {
+<b class="nc">&nbsp;        return queries.selectAll()</b>
+<b class="nc">&nbsp;            .asFlow()</b>
+&nbsp;            // Kita paksa menentukan tipe data objek &#39;Note&#39; secara eksplisit di sini
+<b class="nc">&nbsp;            .mapToList(Dispatchers.IO)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // 2. Tambah Catatan (Menggunakan insert sesuai .sq)
+&nbsp;    suspend fun insertNote(title: String, content: String) {
+<b class="fc">&nbsp;        val currentTime = clockTime()</b>
+<b class="fc">&nbsp;        queries.insert(</b>
+<b class="fc">&nbsp;            title = title,</b>
+<b class="fc">&nbsp;            content = content,</b>
+<b class="fc">&nbsp;            created_at = currentTime</b>
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    // 3. Hapus Catatan (Menggunakan delete sesuai .sq)
+&nbsp;    suspend fun deleteNote(id: Long) {
+<b class="fc">&nbsp;        queries.delete(id)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @OptIn(ExperimentalTime::class)
+&nbsp;    private fun clockTime(): Long {
+&nbsp;        // Panggil Clock.System murni milik Kotlin Multiplatform
+<b class="fc">&nbsp;        return kotlin.time.Clock.System.now().toEpochMilliseconds()</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-05-18 15:03</div>
+</div>
+</body>
+</html>
