@@ -1,45 +1,62 @@
-Strategi & Implementasi Testing
-Proyek ini menerapkan pengujian ketat untuk memastikan stabilitas kode dengan target Code Coverage komponen logika bisnis (ViewModel & Repository) minimal 60%.
+# NotesApp - Kotlin Multiplatform (KMP) Practicum
 
-1. Flow Testing dengan Turbine (Layer ViewModel)
-Pengujian aliran data asinkronus menggunakan Turbine untuk memastikan emisi data dari StateFlow berjalan lancar tanpa hambatan threading. Menggunakan UnconfinedTestDispatcher() guna menghindari isu blocking coroutine.
+Repository ini berisi proyek **NotesApp** yang dibangun menggunakan **Kotlin Multiplatform (KMP)** dan **Compose Multiplatform**. Proyek ini dirancang sebagai pemenuhan tugas praktikum pengembangan aplikasi mobile modern dengan menerapkan Arsitektur MVVM, Dependency Injection (DI), Asynchronous Flow, serta pengujian perangkat lunak yang komprehensif (Unit Testing, Flow Testing, dan UI Testing).
 
-Skenario pengujian meliputi:
+---
 
-Test Case 1 (test5_NotesFlow_EmitsInitialStateAndUpdatedData): Memastikan Flow memancarkan state awal (kosong) dan berhasil memancarkan data terbaru setelah pemicu (loadNotes()) dipanggil.
+## Fitur Utama
+- **Manajemen Catatan (Notes Management)**: Menambah, melihat, dan menghapus catatan secara lokal.
+- **Arsitektur Clean & Reusable**: Memisahkan logika bisnis (*Business Logic*), repositori data, dan antarmuka (UI) agar kode dapat digunakan kembali di berbagai platform (Android/iOS).
+- **Integrasi Gemini Service**: Fitur berbasis AI menggunakan `GeminiService` dengan manajemen jaringan terpusat via `HttpClient` dan `NetworkMonitor`.
 
-Test Case 2 (test6_NotesFlow_ShouldBeEmpty_WhenRepositoryIsEmpty): Memastikan Flow mengembalikan daftar kosong secara valid ketika repository tidak memiliki data.
+---
 
-2. UI Testing (Layer NotesScreen)
-Pengujian visual dan fungsionalitas UI Compose ditempatkan pada direktori androidInstrumentedTest dengan cakupan minimal 3 kasus uji:
+## Stack Teknologi & Library
+- **Core**: Kotlin Multiplatform (KMP)
+- **UI Framework**: Compose Multiplatform / Jetpack Compose
+- **Dependency Injection**: Koin Core & Koin Android
+- **Concurrency & Asynchronous**: Kotlin Coroutines & Asynchronous Flow
+- **Testing Framework**:
+  - JUnit 4 & Kotlin Test
+  - **MockK**: Untuk melakukan mocking pada layer Repository.
+  - **Turbine**: Library khusus untuk menguji alur data (`Flow` dan `StateFlow`).
+  - **Compose UI Test**: Untuk pengujian fungsionalitas komponen antarmuka Android.
 
-Test Case 1 (test1_NotesList_ShouldDisplayNotes): Memastikan item catatan (Judul & Konten) muncul dengan benar di layar saat list berisi data.
+---
 
-Test Case 2 (test2_AddNoteForm_ShouldAcceptInput): Mensimulasikan input teks pada form judul/konten dan memastikan tombol "Simpan" meneruskan data secara valid.
+## Arsitektur Proyek
+Aplikasi ini menerapkan pola arsitektur **MVVM (Model-View-ViewModel)** dengan struktur sebagai berikut:
 
-Test Case 3 (test3_EmptyNotes_ShouldShowEmptyMessage): Memastikan pesan fallback/placeholder seperti "Tidak ada catatan" muncul jika list data kosong.
+1. **View (UI Layer)**: `NotesScreen.kt` yang menampilkan visualisasi data catatan dan menangkap interaksi pengguna.
+2. **ViewModel**: `NotesViewModel.kt` yang mengelola state UI (`notes`) berbasis `StateFlow` dan menjembatani aksi UI ke layer data.
+3. **Repository**: `NotesRepository.kt` yang mengabstraksi sumber data (Database/Network).
+4. **Model/Entity**: `Note.kt` sebagai skema representasi data catatan.
 
-⚙️ Cara Menjalankan Aplikasi & Pengujian
-Menjalankan Aplikasi
-Pilih konfigurasi run composeApp di Android Studio dan klik tombol Run, atau gunakan gradle command:
+---
 
-Bash
-./gradlew :composeApp:assembleDebug
-Menjalankan Unit & Flow Test
-Untuk mengeksekusi seluruh pengujian logika bisnis pada ViewModel dan Repository, jalankan perintah berikut:
+## Manajemen Dependency Injection (Koin)
 
-Bash
-./gradlew :composeApp:testDebugUnitTest
-Menjalankan UI Test Compose
-Pastikan emulator atau perangkat Android fisik dalam kondisi aktif dan terhubung, kemudian jalankan:
+Konfigurasi DI diatur di dalam `AppModule.kt`. Seluruh komponen didaftarkan agar pembuatan objek otomatis ditangani oleh Koin menggunakan pola resolusi ketergantungan yang tepat:
 
-Bash
-./gradlew :composeApp:connectedDebugAndroidTest
-Memeriksa Code Coverage (Batas Minimum 60%)
-Untuk melihat persentase cakupan kode logika bisnis:
+```kotlin
+val appModule = module {
+    // 1. Mendaftarkan HTTP Client untuk keperluan network/AI
+    single { HttpClient() }
 
-Klik kanan pada paket test atau class test utama (misal NotesViewModelTest).
+    // 2. GeminiService membutuhkan HttpClient, di-inject menggunakan get()
+    single { GeminiService(client = get()) }
 
-Pilih opsi "Run 'NotesViewModelTest' with Coverage".
+    // 3. NetworkMonitor didaftarkan menggunakan factory agar selalu membuat instance baru
+    factory { NetworkMonitor(context = androidContext()) }
+}
+```
+---
 
-Hasil presentase baris (Line %) dan metode (Method %) akan muncul pada panel Coverage Android Studio.
+## Screenshot
+<img src="1.png" width="400" />
+
+<img src="2.png" width="400" />
+
+<img src="3.png" width="400" />
+
+<img src="4.png" width="400" />
