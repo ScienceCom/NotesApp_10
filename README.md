@@ -1,4 +1,4 @@
-# NotesApp - Kotlin Multiplatform (KMP) Practicum
+# NotesApp - Kotlin Multiplatform
 
 Repository ini berisi proyek **NotesApp** yang dibangun menggunakan **Kotlin Multiplatform (KMP)** dan **Compose Multiplatform**. Proyek ini dirancang sebagai pemenuhan tugas praktikum pengembangan aplikasi mobile modern dengan menerapkan Arsitektur MVVM, Dependency Injection (DI), Asynchronous Flow, serta pengujian perangkat lunak yang komprehensif (Unit Testing, Flow Testing, dan UI Testing).
 
